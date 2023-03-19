@@ -24,7 +24,7 @@ game_title = Label(
     bg='black',
     fg='white',
     text='Minesweeper Game',
-    fon=('', 48)
+    font=('', 48)
 )
 
 game_title.place(
