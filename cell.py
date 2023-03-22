@@ -7,6 +7,7 @@ import sys
 
 class Cell:
     all = []
+    started = False
     cell_count = settings.CELL_COUNT
     cell_count_label_object = None
 
@@ -28,8 +29,8 @@ class Cell:
             height=2,
             # text=f"{self.x},{self.y}"
         )
-        btn.bind('<Button-1>', self.left_click_actions)  # Left Click
-        btn.bind('<Button-3>', self.right_click_actions)  # Right Click
+        btn.bind('<ButtonRelease-1>', self.left_click_actions)  # Left Click
+        btn.bind('<ButtonRelease-3>', self.right_click_actions)  # Right Click
         self.cell_btn_object = btn
 
     @staticmethod
@@ -44,21 +45,22 @@ class Cell:
         Cell.cell_count_label_object = lbl
 
     def left_click_actions(self, event):  # for some reason two arguments are necessary for a tk event
+        Cell.stared = True
         if self.is_mine:
             self.show_mine()
         else:
             self.show_cell()
-            if self.surrounding_cells_mines_length == 0:
-                for cell_obj in self.surrounding_cells:
-                    cell_obj.show_cell()
+#            if self.surrounding_cells_mines_length == 0:
+#                for cell_obj in self.surrounding_cells:
+#                    cell_obj.show_cell()
             # If Mines count is equal to the cells left count, player won
             if Cell.cell_count == settings.NO_MINES:
                 ctypes.windll.user32.MessageBoxW(0, 'Congratulations! You won.', 'Game Over', 0)
                 sys.exit()
 
         # Cancel Left and Right click events if the cell is already open:
-        self.cell_btn_object.unbind('<Button-1>')
-        self.cell_btn_object.unbind('<Button-3>')
+        self.cell_btn_object.unbind('<ButtonRelease-1>')
+        self.cell_btn_object.unbind('<ButtonRelease-3>')
 
     def get_cell_by_axis(self, x, y):
         # Return a cell object based on the value of x and y
@@ -93,7 +95,9 @@ class Cell:
     def show_cell(self):
         if not self.is_open:
             Cell.cell_count -= 1
-            self.cell_btn_object.configure(text=self.surrounding_cells_mines_length)
+            if self.surrounding_cells_mines_length != 0:
+                self.cell_btn_object.configure(text=self.surrounding_cells_mines_length,
+                                               fg=settings.DICT_NO_TEXT_COLOR[self.surrounding_cells_mines_length])
             # Replace the text of cell count label with the newer count
             if Cell.cell_count_label_object:
                 Cell.cell_count_label_object.configure(
@@ -102,10 +106,14 @@ class Cell:
             # If this was a mine candidate, then for safety, we should
             # configure the background color to SystemButtonFace
             self.cell_btn_object.configure(
-                bg='SystemButtonFace'
+                bg='gainsboro'
             )
         #Mark the cell as opened (Use is as the last line of this method)
         self.is_open = True
+        if self.surrounding_cells_mines_length == 0:
+            for cell_obj in self.surrounding_cells:
+                if not cell_obj.is_open:
+                    cell_obj.show_cell()
 
     def show_mine(self):
         self.cell_btn_object.configure(bg='red')
@@ -113,6 +121,7 @@ class Cell:
         sys.exit()
 
     def right_click_actions(self, event):
+        Cell.stared = True
         if not self.is_flagged:
             self.cell_btn_object.configure(
                 bg='orange'
