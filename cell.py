@@ -28,6 +28,7 @@ class Cell:
             width=6,
             height=2,
             # text=f"{self.x},{self.y}"
+            bg="darkgrey"
         )
         btn.bind('<ButtonRelease-1>', self.left_click_actions)  # Left Click
         btn.bind('<ButtonRelease-3>', self.right_click_actions)  # Right Click
@@ -106,7 +107,7 @@ class Cell:
             # If this was a mine candidate, then for safety, we should
             # configure the background color to SystemButtonFace
             self.cell_btn_object.configure(
-                bg='gainsboro'
+                bg='grey'
             )
         #Mark the cell as opened (Use is as the last line of this method)
         self.is_open = True
@@ -129,7 +130,7 @@ class Cell:
             self.is_flagged = True
         else:
             self.cell_btn_object.configure(
-                bg='SystemButtonFace'
+                bg='darkgrey'
             )
             self.is_flagged = False
 
